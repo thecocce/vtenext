@@ -1,6 +1,5 @@
 FROM php:7.4-apache-bullseye
 
-LABEL maintainer="Castaldo Solutions <info@castaldosolutions.it>"
 LABEL description="VTENext CE - Dockerized for local development and testing"
 LABEL source="https://github.com/VTECRM/vtenext"
 
