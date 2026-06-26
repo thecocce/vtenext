@@ -99,7 +99,7 @@ $sectionTitle = 'Administrator user activation';
 									<input type="hidden" name="module" value="Morphsuit">
 									<input type="hidden" name="action" value="MorphsuitAjax">
 									<input type="hidden" name="file" value="SendMorphsuit">
-									<input type="hidden" name="type" value="<?php echo $_REQUEST['type']; ?>">
+									<input type="hidden" name="type" value="<?php echo htmlspecialchars($_REQUEST['type'], ENT_QUOTES, 'UTF-8'); ?>">
 									<input type="hidden" name="vte_user_info" value="">
 									
 									<table class="table borderless" id="Standard">

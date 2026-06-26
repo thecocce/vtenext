@@ -34,7 +34,7 @@ class VteSession {
 	
 	protected static $shutdownMemory = null; // crmv@169814
 
-	public static function start() {
+	public static function start(string $cookieurl = '') {
 	
 		if (self::$sessionStarted) {
 			self::log("Session already started");
@@ -80,10 +80,12 @@ class VteSession {
 		$isHttps = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off');
 
 		// set the cookie url relative to this vte
-		if (substr($_SERVER['SCRIPT_NAME'], -12) == 'Touch/ws.php') {
-			$cookieurl = str_ireplace('modules/Touch/ws.php', '', $_SERVER['SCRIPT_NAME']) ?: '/';
-		} else {
-			$cookieurl = dirname($_SERVER['SCRIPT_NAME']) ?: '/';
+		if (!$cookieurl) {
+			if (substr($_SERVER['SCRIPT_NAME'], -12) == 'Touch/ws.php') {
+				$cookieurl = str_ireplace('modules/Touch/ws.php', '', $_SERVER['SCRIPT_NAME']) ?: '/';
+			} else {
+				$cookieurl = dirname($_SERVER['SCRIPT_NAME']) ?: '/';
+			}
 		}
 
 		session_set_cookie_params(0, $cookieurl, null, $isHttps, true); // crmv@80972

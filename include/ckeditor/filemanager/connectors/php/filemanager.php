@@ -18,6 +18,10 @@ require_once('../../../../../config.php');
 chdir($root_directory);
 include_once('include/utils/utils.php');
 // crmv@10621e crmv@198780e
+
+// start session now, with the proper cookie url
+VteSession::start(CRMVUtils::getVTEUrl(__FILE__));
+
 $fm = new Filemanager($config);
 
 $response = '';

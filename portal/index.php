@@ -47,7 +47,6 @@ elseif($_REQUEST['logout'] == 'true')
 	unset($_SESSION['support_start_date']);
 	unset($_SESSION['support_end_date']);
 	unset($_SESSION['__permitted_modules']);
-	unset($_SESSION['customer_account_id']);
 	
 	//crmv@remember_me
 	setcookie('VTEPORTALLOGINID', false);
@@ -155,15 +154,6 @@ else
 		}
 		//crmv@5946e
 		
-		// Set customer account id
-		if(isset($_SESSION['customer_account_id'])) {
-			$account_id = $_SESSION['customer_account_id']; 
-		} else {		
-			$params = Array('id'=>$customerid);
-			$account_id = $client->call('get_check_account_id', $params, $Server_Path, $Server_Path);
-			$_SESSION['customer_account_id'] = $account_id;
-		}
-		// End
 		$is_logged = 1;
 		
 		// Star HelpDesk
@@ -232,6 +222,9 @@ else
 				$sessionid = $_SESSION['customer_sessionid'];
 				$params = array(Array('id'=>$customerid,'fileid'=>$fileid,'filename'=>$filename,'sessionid'=>$sessionid,'ticketid'=>$ticketid));
 				$fileContent = $client->call('get_filecontent', $params, $Server_Path, $Server_Path);
+				if (empty($fileContent) || !is_array($fileContent)) {
+					exit();
+				}
 				$fileContent = $fileContent[0];
 				$filesize = strlen(base64_decode($fileContent));
 

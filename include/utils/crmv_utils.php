@@ -71,6 +71,26 @@ class CRMVUtils extends SDKExtendableUniqueClass {
 		return $jsvar;
 	}
 
+	// crmv@303843
+	/**
+	 * Calculate the VTE base path from the requested URL.
+	 * The idea is to go back from the current file until the config.inc.php
+	 * and go back the same amount from the requested url to derive the 
+	 * the public facing VTE base path.
+	 * @param string $entryfile 
+	 * @return string
+	 */
+	public static function getVTEUrl(string $entryfile) {
+		$vpath = dirname($_SERVER['SCRIPT_NAME']);
+		$cdir = dirname($entryfile);
+		while ($cdir != '/' && !file_exists($cdir.'/config.inc.php')) {
+			$cdir = dirname($cdir);
+			$vpath = dirname($vpath);
+		}
+		return $vpath;
+	}
+	// crmv@303843e
+
 	// crmv@111926
 	/**
 	 * Check if the number of input variables exceeded the max_input_var setting

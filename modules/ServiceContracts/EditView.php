@@ -22,7 +22,7 @@ if(!empty($_REQUEST['service_id'])) {
 				$service_quantity = $serviceObj->column_fields['qty_per_unit'];
 				$result = $adb->query("SELECT SUM(total_units) as total_units FROM ".$table_prefix."_servicecontracts
 										INNER JOIN ".$table_prefix."_crmentity ON ".$table_prefix."_crmentity.crmid = ".$table_prefix."_servicecontracts.servicecontractsid
-										WHERE deleted = 0 AND sorder_id = ".$_REQUEST['return_id']." AND service_id = ".$_REQUEST['service_id']."
+										WHERE deleted = 0 AND sorder_id = ".intval($_REQUEST['return_id'])." AND service_id = ".intval($_REQUEST['service_id'])."
 										GROUP BY sorder_id");
 				if ($result) $sum = $adb->query_result($result,0,'total_units');
 				$changedFields['total_units'] = ($service_quantity*$order_quantity)-$sum;

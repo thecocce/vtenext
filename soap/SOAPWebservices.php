@@ -111,11 +111,6 @@ class SOAPWebservices extends SOAPWebservicesBase {
 			'params' => array('id'=>'xsd:string','contactid'=>'xsd:string','sessionid'=>'xsd:string'),
 			'return' =>'tns:field_details_array',
 			),
-		array(
-			'name' => 'get_check_account_id',
-			'params' => array('id'=>'xsd:string'),
-			'return' => 'xsd:string',
-			),
 		//to get details of quotes,invoices and documents
 		array(
 			'name' => 'get_details',
@@ -1177,26 +1172,6 @@ class SOAPWebservices extends SOAPWebservicesBase {
 		//crmv@157490e
 		
 		$salt = '';
-		if(is_numeric($username)){
-			$q = "SELECT user_name, user_password FROM {$table_prefix}_portalinfo WHERE id = ?";
-			$ress = $adb->pquery($q, array($username));
-			
-			if($adb->num_rows($ress)>0){
-				$token = $password;
-				
-				$username = $adb->query_result($ress,0,'user_name');
-				$password = $encryption->decrypt($adb->query_result($ress,0,'user_password')); //crmv@157490
-				$salt = 'QO(:Q!u@=Y>(MoX=Q1Jx%w:NZV-Ljcnsw>3-qIv@|u_~uDA+|52x<-1Mn{ywdyor';
-				if(!crypt($username.$password,$salt) == $token){
-					return array('',array('err1'=>'INVALID_USERNAME_OR_PASSWORD'));
-				}
-			}else{
-				//forzo l'errore
-				$username = '';
-				$password = '';
-			}
-		}
-		
 		$username = $adb->sql_escape_string($username);
 		$password = $adb->sql_escape_string($encryption->encrypt($password)); //crmv@157490
 
@@ -1586,11 +1561,36 @@ class SOAPWebservices extends SOAPWebservicesBase {
 		$id = $input_array['id'];
 		$sessionid = $input_array['sessionid'];
 		$fileid = $input_array['fileid'];
+		$ticketid = $input_array['ticketid'];
 		//$filename = $input_array['filename'];
-		//$ticketid = $input_array['ticketid'];
-		
-		if(!$this->validateSession($id,$sessionid))	return null;
-		
+
+		if (!$this->validateSession($id, $sessionid)) {
+			return null;
+		}
+
+		$isPermitted = $this->check_permission($id, 'HelpDesk', $ticketid);
+		if (!$isPermitted) {
+			return null;
+		}
+
+		$ticketAttachments = (array) $this->get_ticket_attachments([
+			'id' => $id,
+			'sessionid' => $sessionid,
+			'ticketid' => $ticketid
+		]);
+
+		$found = false;
+		foreach ($ticketAttachments as $attachment) {
+			if ((int) $attachment['fileid'] === (int) $fileid) {
+				$found = true;
+				break;
+			}
+		}
+
+		if (!$found) {
+			return null;
+		}
+
 		$FS = FileStorage::getInstance();
 		$filecontents = $FS->downloadFile($fileid, ['return_content' => true]);
 		$filecontents = [$fileid => base64_encode($filecontents)];
@@ -2449,14 +2449,12 @@ class SOAPWebservices extends SOAPWebservicesBase {
 		(!empty($language)) ? $current_language = $language : $current_language = $default_language;
 
 		$isPermitted = $this->check_permission($customerid,$module,$id);
-		if($isPermitted == false && $module != 'Accounts') { // crmv@5946
+		if($isPermitted == false) { // crmv@5946
 			return array("#NOT AUTHORIZED#");
 		}
 
-		if($module != 'Accounts'){ // crmv@5946
-			if(!$this->validateSession($customerid,$sessionid))
-			return null;
-		}	
+		if(!$this->validateSession($customerid,$sessionid))
+		return null;
 			
 		if($module == 'Quotes'){
 			$query =  "SELECT
@@ -3325,10 +3323,6 @@ class SOAPWebservices extends SOAPWebservicesBase {
 				// allow only my account
 				$accountid = $this->get_check_account_id($customerid);
 				return ($accountid == $entityid);
-				break;
-			case 'Potentials':
-				// always permitted... why ??
-				return true;
 			case 'Documents':
 				// linked to ANY faq (why??)
 				$query = 

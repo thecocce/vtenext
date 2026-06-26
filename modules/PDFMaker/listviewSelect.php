@@ -14,6 +14,8 @@ $pdf_strings = return_module_language($language, "PDFMaker");
 
 $smarty=new VteSmarty();
 
+$returnModule = preg_replace("/[^a-zA-Z0-9_\-\s]/", '', $_REQUEST["return_module"]);
+
 $smarty->assign("MOD",$mod_strings);
 $smarty->assign("APP",$app_strings);
 $smarty->assign("PDF",$pdf_strings);
@@ -43,11 +45,11 @@ while($default_row = $adb->fetchByAssoc($default_res))
 
 $temp_sql = "SELECT templateid, filename AS templatename
              FROM ".$table_prefix."_pdfmaker
-             WHERE module = '".$_REQUEST['return_module']."'";
+             WHERE module = ?";//crmv@211287
 if(isset($inactive_arr)){
-  $temp_sql.=" AND templateid NOT IN (".implode($inactive_arr,",").")";
+  $temp_sql.=" AND templateid NOT IN (".implode(",", $inactive_arr).")";
 }      
-$temp_result = $adb->query($temp_sql);
+$temp_result = $adb->pquery($temp_sql, array($_REQUEST['return_module']));//crmv@211287
 
 //TEMPLATES BLOCK
 $options="";
@@ -113,7 +115,7 @@ if($adb->num_rows($temp_result)>0)
   $generate_pdf='
       <tr>
     		<td class="dvtCellInfo" style="width:100%;" align="center">   		    
-          <input type="button" class="crmbutton small save" value="'.$app_strings["LBL_EXPORT_TO_PDF"].'" onclick="if(VTE.PDFMakerActions.getSelectedTemplates()==\'\') alert(\''.$pdf_strings["SELECT_TEMPLATE"].'\'); else document.location.href=\'index.php?module=PDFMaker&relmodule='.$_REQUEST["return_module"].'&action=CreatePDFFromTemplate&idslist=true&commontemplateid=\'+VTE.PDFMakerActions.getSelectedTemplates()+\'&language=\'+document.getElementById(\'template_language\').value; hideFloatingDiv(\'PDFListViewDivCont\');" />            
+          <input type="button" class="crmbutton small save" value="'.$app_strings["LBL_EXPORT_TO_PDF"].'" onclick="if(VTE.PDFMakerActions.getSelectedTemplates()==\'\') alert(\''.$pdf_strings["SELECT_TEMPLATE"].'\'); else document.location.href=\'index.php?module=PDFMaker&relmodule='.$returnModule.'&action=CreatePDFFromTemplate&idslist=true&commontemplateid=\'+VTE.PDFMakerActions.getSelectedTemplates()+\'&language=\'+document.getElementById(\'template_language\').value; hideFloatingDiv(\'PDFListViewDivCont\');" />            
           <input type="button" class="crmbutton small cancel" value="'.$app_strings["LBL_CANCEL_BUTTON_LABEL"].'" onclick="hideFloatingDiv(\'PDFListViewDivCont\');" />      
         </td>
   		</tr>';
@@ -128,7 +130,7 @@ else
   if(isPermitted("PDFMaker","EditView") == 'yes')
   {
     $template_output.='<br />'.$pdf_strings["CRM_TEMPLATES_ADMIN"].'
-                      <a href="index.php?module=PDFMaker&action=EditPDFTemplate&return_module='.$_REQUEST["return_module"].'&parenttab=Tools" class="webMnu">'.$pdf_strings["TEMPLATE_CREATE_HERE"].'</a>'; 
+                      <a href="index.php?module=PDFMaker&action=EditPDFTemplate&return_module='.$returnModule.'&parenttab=Tools" class="webMnu">'.$pdf_strings["TEMPLATE_CREATE_HERE"].'</a>'; 
   }                		            
   
   $template_output.='</td></tr>';

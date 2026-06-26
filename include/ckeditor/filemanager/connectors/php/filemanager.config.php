@@ -18,22 +18,11 @@
  *	@return boolean true is access granted, false if no access
  */
 function auth() {
-	// You can insert your own code over here to check if the user is authorized.
-	// If you use a session variable, you've got to start the session first (VteSession::start())
-	// crmv@128133
-	if (!class_exists('VteSession')) {
-		require_once('../../../../VteSession.php');
-	}
-	// crmv@128133e
-	//crmv@10621
-	VteSession::start();
 	global $application_unique_key;
-	if(VteSession::hasKey("authenticated_user_id") && (VteSession::hasKey("app_unique_key") && VteSession::get("app_unique_key") == $application_unique_key))
-	{
-	        return true;
+	if (VteSession::hasKey('authenticated_user_id') && (VteSession::hasKey('app_unique_key') && VteSession::get('app_unique_key') == $application_unique_key)) {
+		return true;
 	}
 	return false;
-	//crmv@10621 e
 }
 
 /**

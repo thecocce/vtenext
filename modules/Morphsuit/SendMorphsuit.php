@@ -193,7 +193,7 @@ $sectionTitle = $mod_strings['LBL_MORPHSUIT_ACTIVATION']." $enterprise_mode $ent
 								<input type="hidden" name="action" value="MorphsuitAjax">
 								<input type="hidden" name="file" value="">
 								<input type="hidden" name="type" value="">
-								<input type="hidden" name="vte_user_info" value='<?php echo $_REQUEST['vte_user_info']; ?>'>
+								<input type="hidden" name="vte_user_info" value='<?php echo htmlspecialchars($_REQUEST['vte_user_info'], ENT_QUOTES, 'UTF-8'); ?>'>
 								<?php if ($installation_mode) { ?>
 								<input type="hidden" name="mode" value="installation">
 								<?php } ?>

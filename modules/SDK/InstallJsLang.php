@@ -11,7 +11,7 @@
 <script language="JavaScript" type="text/javascript" src="include/js/json2.js"></script>	
 <script language="JavaScript" type="text/javascript" src="include/js/jquery.js"></script>
 <script language="JavaScript" type="text/javascript" src="include/js/jquery_plugins/form.js"></script>
-<script language="JavaScript" type="text/javascript" src="include/js/<?php echo $_REQUEST['language'];?>.lang.js"></script>
+<script language="JavaScript" type="text/javascript" src="include/js/<?php echo htmlspecialchars($_REQUEST['language'], ENT_QUOTES, 'UTF-8'); ?>.lang.js"></script>
 </head>
 <body>
 <form id="lang" name="lang" action="index.php" method="post">
@@ -19,7 +19,7 @@
 	<input type="hidden" name="module" value="SDK">
 	<input type="hidden" name="file" value="WriteJsLang">
 	<input type="hidden" name="action" value="SDKAjax">
-	<input type="hidden" name="language" id="language" value="<?php echo $_REQUEST['language'];?>">
+	<input type="hidden" name="language" id="language" value="<?php echo htmlspecialchars($_REQUEST['language'], ENT_QUOTES, 'UTF-8'); ?>">
 	<input type="hidden" name="params" id="params" value="">
 <script>
 var options = {
